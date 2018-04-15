@@ -1,0 +1,154 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>French Vocabulary Gender Tester</title>
+    <style>
+      .score {font-size:larger; }
+      #word {font-size:xx-large; }
+      td {width: 33.33%;font-size:xx-large; }
+      td:hover {background-color: cornflowerblue;cursor: pointer}
+    </style>
+    <!-- feminin and masculin are declared here!! -->
+    <script src="words1.js"></script>
+  </head>
+  <body>
+    <center><h3>French Vocabulary Gender Tester</h3></center>
+    <center>
+      <button onclick="startGame();">New Game</button>
+      <button onclick="showHighScores();">Highscores</button>
+      <button id="mode" onclick="toggleMode();">Activate Hard Mode</button>
+    </center>
+    <br>
+    <center>
+      <span id="score" class="score"></span>
+      <span id="mistakes" class="score"></span>
+    <center>
+    <table style="width:100%">
+    <tbody><tr style="width=100%">
+    <td id="Le" onclick="guess('masculin');"><center></center></td>
+    <td><center><span id="feedback"></span></center></td>
+    <td id="La" onclick="guess('feminin');"><center></center></td>
+    </tr>
+    </tbody></table>
+    <div id="buffer" style="height: 325px">
+    </div>
+    <center><span id="word"></span></center>
+  <script>
+  const rowStart = 25;
+  let score = 0,
+      row = rowStart,
+      word = '',
+      currentWord,
+      currentWordIndex,
+      currentAnswer,
+      lastAnswer,
+      wordCount = feminin.length + masculin.length,
+      interval,
+      mistakes;
+      
+  function guess(sex){
+  	let actualSex = (currentWordIndex>=feminin.length) ? 'masculin' : 'feminin';
+  	if( sex == actualSex ){
+     score = score + row;
+     lastAnswer ='ok';
+  	}else{
+     mistakes++;
+     //Regular punishing
+     score = score - row;
+     //Twice in a row wrong
+     if(lastAnswer=='nok')
+       score = score - 25;
+     lastAnswer ='nok';
+  	}
+   chooseWord();
+   row = rowStart;
+   
+   if(score>200){
+      win();
+   }
+  }
+
+  function win(){
+    clearInterval(interval);
+    currentWord = -1;
+    $('#score').innerText = 'Score: ' + score;
+    $('#le').innerHTML = '';
+    $('#la').innerHTML = '';
+    $('#word').innerHTML = '';
+    $('#feedback').innerHTML = '<img src="winner.jpg" style="width:100%">You are a winner!!';
+  }
+
+  function startGame(){
+    score = 0;
+    mistakes = 0;
+    chooseWord();
+    $('#feedback').innerHTML = '<img src="pensive.jpg" style="width:50%">';
+    interval = setInterval(updateGame, 7 * 1000 / 25 ); //4 seconds in 25 increments..
+    $('#le').innerHTML = 'Le'
+    $('#la').innerHTML = 'La'
+    //setInterval(updateGame, 4000 ); //4 seconds in 25 increments..
+    //updateGame();
+  }
+
+  function chooseWord(){
+    currentWordIndex = Math.floor(Math.random() * wordCount);
+    currentWord = (currentWordIndex>=feminin.length) ? masculin[currentWordIndex-feminin.length] : feminin[currentWordIndex];
+    console.log(currentWordIndex,currentWord);
+  }
+  
+  function updateGame(){
+  	//Show score
+    $('#score').innerText = 'Score: ' + score;
+    $('#mistakes').innerText = 'Mistakes: ' + mistakes;
+    //Show feedback
+    if(lastAnswer=='ok'){
+      $('#feedback').innerHTML = '<img src="thumbsup.jpg" style="width:50%">';
+    }else if(lastAnswer == 'nok'){
+      $('#feedback').innerHTML = '<img src="facepalm.jpg" style="width:50%">';
+    }
+    //Show word
+    $('#word').innerHTML = currentWord;
+    //Float Word
+    row--;
+    $('#buffer').style.height = (row*12) + 'px';
+    //Switch back to pensive monkey at 7
+    if(row < 8){
+      $('#feedback').innerHTML = '<img src="pensive.jpg" style="width:50%">';
+    }
+    if(row==0){
+      score -= 25;
+      lastAnswer = 'nok';
+      chooseWord();
+      row = rowStart;
+    }
+  }
+
+  function showHighScores(){
+
+  }
+
+  function toggleMode(){
+    const easyModeLabel = 'Activate Hard Mode',
+          hardModeLabel = 'Activate Normal Mode';
+    let button = $('#mode'),
+        label = button.innerText;
+    if(label == easyModeLabel){
+      button.innerText = hardModeLabel;
+    }else{
+      button.innerText = easyModeLabel;
+    }
+
+    console.log(button.label);
+  }
+
+  function $(q){
+    return document.querySelector(q);
+  }
+
+  function $$(q){
+    return document.querySelectorAll(q);
+  }
+
+  </script>
+  
+</body></html>
